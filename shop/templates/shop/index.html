@@ -39,7 +39,7 @@
                 <div class="widgets-wrap float-md-right">
                     <div class="widget-header  mr-3">
                         <a href="#" class="icon icon-sm rounded-circle border"><i class="fa fa-shopping-cart"></i></a>
-                        <span class="badge badge-pill badge-danger notify">0</span>
+                        <span id='cart' class="badge badge-pill badge-danger notify">0</span>
                     </div>
                     <div class="widget-header icontext">
                         <a href="#" class="icon icon-sm rounded-circle border"><i class="fa fa-user"></i></a>
@@ -178,12 +178,14 @@
         <div class="row">
             {% for product in product_objects %}
             <div class="col-md-3">
-                <div href="#" class="card card-product-grid">
-                    <a href="#" class="img-wrap"> 
+                <div href="/{{ product.id }}" class="card card-product-grid">
+                    <a href="/{{ product.id }}" class="img-wrap"> 
                         <img src="{{ product.image.url }}" style="max-width: 100%;"> </a>
                     <figcaption class="info-wrap">
-                        <a href="#" class="title">{{ product.title }}</a>
+                        <a href="/{{ product.id }}" class="title">{{ product.title }}</a>
                         <div class="price mt-1">{{ product.price }}</div> <!-- price-wrap.// -->
+                        <a href="/{{product.id}}" class="btn btn-primary">Details</a>
+                        <button id='{{product.id}}' class="btn btn-primary atc"> <i class="fa fa-shopping-cart"></i> <span class="text"> Add To Cart</span> </button>
                     </figcaption>
                 </div>
             </div> <!-- col.// -->
@@ -488,53 +490,10 @@
                 </section>
             </div><!-- //container -->
         </footer>
-        <!-- </div>
-        <div class="row">
-            {% for product in product_objects %}
-            <div class="col-md-3">
-                <div class="card">
-                    <img src="{{ product.image }}" class='card-img-top'>
-                    <div class='card-body'>
-                        <div class='card-title'>
-                            {{ product.title }}
-                        </div>
-                        <div class="card-text">
-                            $ {{ product.price }}
-                        </div>
-                        <a href='/{{ product.id }}'class="btn btn-warning">View</a>
-                        <button id='{{ product.id }}' class="btn atc btn-warning">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        <div class="row">
-            <div class="col-md-3 offset-md-4">
-                <ul class="pagination">
-                    {% if product_objects.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ product_objects.previous_page_number }}">Previous</a>
-                        </li>
-                    {% endif %}
-
-                    <li class="page-item active">
-                        <a class="page-link" href="?page={{ product_objects }}">Current</a>
-                    </li>
-
-                    {% if product_objects.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ product_objects.previous_page_number }}">Next</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </div> -->
 </body>
 <script>
+    console.log('js running')
     $(function () {
-    $('[data-toggle="popover"]').popover()
-    })
 
     if(localStorage.getItem('cart')==null){
         var cart = {};
@@ -543,19 +502,17 @@
         cart = JSON.parse(localStorage.getItem('cart'));
     }
 
-
     $(document).on('click', '.atc', function(){
         var item_id = this.id.toString();
-        console.log(item_id)
         if(cart[item_id]!=undefined){
             cart[item_id] = cart[item_id] + 1;
 
         } else {
             cart[item_id] = 1
         }
-        console.log(cart);
         localStorage.setItem('cart', JSON.stringify(cart))
-        document.getElementById("cart").innerHTML = "Cart (" + Object.keys(cart).length + ")"
+        document.getElementById("cart").innerHTML = Object.keys(cart).length
+        })
     })
 
 </script>
