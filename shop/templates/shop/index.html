@@ -38,8 +38,8 @@
             <div class="col-lg-3 col-sm-6 col-12">
                 <div class="widgets-wrap float-md-right">
                     <div class="widget-header  mr-3">
-                        <a href="#" class="icon icon-sm rounded-circle border"><i class="fa fa-shopping-cart"></i></a>
-                        <span id='cart' class="badge badge-pill badge-danger notify">0</span>
+                        <a id='cart' href="/checkout" data-container="body" data-toggle="popover" class="icon icon-sm rounded-circle border"><i class="fa fa-shopping-cart"></i></a>
+                        <span  class="badge badge-pill badge-danger notify">0</span>
                     </div>
                     <div class="widget-header icontext">
                         <a href="#" class="icon icon-sm rounded-circle border"><i class="fa fa-user"></i></a>
@@ -178,12 +178,12 @@
         <div class="row">
             {% for product in product_objects %}
             <div class="col-md-3">
-                <div href="/{{ product.id }}" class="card card-product-grid">
+                <a href="/{{ product.id }}" class="card card-product-grid">
                     <a href="/{{ product.id }}" class="img-wrap"> 
                         <img src="{{ product.image.url }}" style="max-width: 100%;"> </a>
                     <figcaption class="info-wrap">
-                        <a href="/{{ product.id }}" class="title">{{ product.title }}</a>
-                        <div class="price mt-1">{{ product.price }}</div> <!-- price-wrap.// -->
+                        <a id="nm{{ product.id }}" href="/{{ product.id }}" class="title">{{ product.title }}</a>
+                        <div id="price{{ product.id }}" class="card-text">{{ product.price }}</div> <!-- price-wrap.// -->
                         <a href="/{{product.id}}" class="btn btn-primary">Details</a>
                         <button id='{{product.id}}' class="btn btn-primary atc"> <i class="fa fa-shopping-cart"></i> <span class="text"> Add To Cart</span> </button>
                     </figcaption>
@@ -491,9 +491,8 @@
             </div><!-- //container -->
         </footer>
 </body>
-<script>
-    console.log('js running')
-    $(function () {
+<script type="text/javascript">
+    window.onload = function() {
 
     if(localStorage.getItem('cart')==null){
         var cart = {};
@@ -502,18 +501,42 @@
         cart = JSON.parse(localStorage.getItem('cart'));
     }
 
-    $(document).on('click', '.atc', function(){
+    $(document).on('click','.atc',function(){
+        console.log("The add to cart button is clicked");
         var item_id = this.id.toString();
-        if(cart[item_id]!=undefined){
-            cart[item_id] = cart[item_id] + 1;
 
-        } else {
-            cart[item_id] = 1
+        if(cart[item_id]!=undefined){
+            quantity = cart[item_id][0] + 1;
+            cart[item_id][0] = quantity;
+            cart[item_id][2] = cart[item_id][2] + parseInt(document.getElementById("price"+item_id).innerHTML);
+            console.log(cart)
+        }else{
+            quantity = 1;
+            price = parseInt(document.getElementById("price"+item_id).innerHTML);
+            name = document.getElementById("nm"+item_id).innerHTML;
+            cart[item_id]=[quantity,name,price];
         }
-        localStorage.setItem('cart', JSON.stringify(cart))
-        document.getElementById("cart").innerHTML = Object.keys(cart).length
-        })
-    })
+        localStorage.setItem('cart',JSON.stringify(cart));
+        document.getElementById("cart").innerHTML = "Cart("+ Object.keys(cart).length +")";
+       
+    });
+ 
+    DisplayCart(cart);
+    function DisplayCart(cart){
+        var cartString ="";
+        cartString += "<h5>This is your cart</h5>";
+        var cartIndex = 1;
+        for(var x in cart){
+            cartString += cartIndex;
+            cartString += document.getElementById("nm"+x).innerHTML + "Qty:" + cart[x][0] + "</br>";
+            cartIndex+=1;
+        }
+
+        cartString += "<a href='/checkout'><button class='btn btn-warning' id='checkout'>Checkout</button></a>";
+        document.getElementById("cart").setAttribute('data-content',cartString);
+        $('[data-toggle="popover"]').popover();
+    }
+    }
 
 </script>
 </html>
